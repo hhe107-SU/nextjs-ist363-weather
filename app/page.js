@@ -1,5 +1,16 @@
+import Button from "../components/Button";
+
+
 const Homepage =()=>{
-  return <div>Whoooo</div>;
+  return (<div>
+  <h1>wheather app</h1>
+  <Button   label="Download"   />
+  <Button   label="Register Now"     />
+  <Button   label="Learn more"      />
+ 
+
+  </div>
+  );
 
 
 
