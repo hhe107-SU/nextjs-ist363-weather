@@ -1,8 +1,9 @@
 import styles from './Button.module.scss';
 
 
-const Button = ({label})=>{
-    return <button className={styles.btn}>{label}</button>; //deconstrct label
+const Button = ({label, clickHandler})=>{
+    return (
+    <button className={styles.btn} onClick={clickHandler}>{label}</button>); //deconstrct label
 
 
 
