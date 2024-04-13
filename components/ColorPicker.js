@@ -73,6 +73,8 @@ const ColorPicker = ()=>{
         setActiveIndex(index);
     
     }}
+
+    
     
     
     />
@@ -92,3 +94,4 @@ const ColorPicker = ()=>{
 
 
 export default ColorPicker;
+
