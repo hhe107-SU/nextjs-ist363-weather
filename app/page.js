@@ -11,25 +11,48 @@ import Button from "../components/Button";
 
 import ColorPicker from "../components/ColorPicker";
 import PeoplePicker from "../components/PeoplePicker";
-import {getPeople, getWeatherData} from "../lib/api";
+import {getPeople, getWeatherData,getGeoLocation} from "../lib/api";
 
 
 const Homepage =()=>{
   const [weatherData,setWeatherData]=useState(null);
+  const[location,setLocation]=usestate(null);
+  const[errorMsg,setErrorMsg]=useState(null);
 
   const peopleArr = getPeople();
   
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await getWeatherData();
-      setWeatherData(response);
 
-    };
-    fetchData();
+  useEffect(()=>{
+    getGeoLocation()
+    .then((position) =>{
+      setLocation(position); })
+     
+    .catch((error)=>{
+      setErrorMsg(error);
+
+      
 
 
-  },[]);
+    });
+}, []);
+
+
+
+
+
+
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const response = await getWeatherData();
+  //     setWeatherData(response);
+
+  //   };
+  //   fetchData();
+
+
+  // },[]);
 
 
   //console.log({peopleArr})
@@ -38,6 +61,7 @@ const Homepage =()=>{
   <div>
   
   <h1>wheather app</h1>
+  {errorMsg && <div>{errorMsg}</div>}
 
   {weatherData &&(<div>
     <h2>{weatherData.city.name}</h2>
