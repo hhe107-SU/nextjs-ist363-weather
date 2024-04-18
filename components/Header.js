@@ -1,11 +1,16 @@
-import Container from "./Container";
+import Row from "./Row";
 
 import styles from "./Header.module.scss";
+import Container from "./Container";
 
 const Header = () => {
   return (
     <header className={styles.header}>
-      <Container>Logo and nav</Container>
+      <Container>
+      <Row justifyContent="space-between"> Logo and nav
+
+      </Row>
+      </Container>
     </header>
   );
 };
