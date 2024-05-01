@@ -1,28 +1,14 @@
-.row{
-    display:flex;
-    
-    background-color: limegreen;
-    height:200px;
-    &,justify-content-space-between{
-        justify-content: space-between;
+@use "../sass/abstracts/mixins";
 
-
-    }
-    &,justify-content-center{
-        justify-content: center;
-
-
-    }
-    &.align-items-center{
-        align-items:center;
-
-
-    }
-    &.align-items-flex-start{
-        align-items:flex-start;
-
-
-    }
-
-
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  //background-color: limegreen;
+  //gap: 1rem;
+  &.border-bottom-1 {
+    border-bottom: 1px solid gray;
+  }
+  @include mixins.generateJustifyContentClasses();
+  @include mixins.generateAlignItemsClasses();
+  @include mixins.generatePaddingClasses();
 }
