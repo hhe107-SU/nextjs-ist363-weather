@@ -1,12 +1,8 @@
 "use client";
 
-// core components
+/* use client */
 import { useState, useEffect } from "react";
-
-// next js components
 import Image from "next/image";
-
-// custom components
 import Button from "../components/Button";
 import Col from "../components/Col";
 import Container from "../components/Container";
@@ -15,8 +11,7 @@ import Row from "../components/Row";
 import Section from "../components/Section";
 import Tabs from "../components/Tabs";
 import Temp from "../components/Temp";
-
-import { getGeoLocation, getPeople, getWeatherDataByLatLon } from "../lib/api";
+import { getGeoLocation, getWeatherDataByLatLon } from "../lib/api";
 
 const Homepage = () => {
   const [loading, setLoading] = useState(true);
@@ -26,45 +21,64 @@ const Homepage = () => {
   const [daysOfWeek, setDaysOfWeek] = useState(null);
   const [activeDayIndex, setActiveDayIndex] = useState(0);
   const [tempUnit, setTempUnit] = useState("imperial");
+  const [recommendation, setRecommendation] = useState("");
+
+  const getRecommendations = (weather) => {
+    const main = weather.main.toLowerCase();
+    const temp = weather.temp;
+    let recommendation = "";
+  
+    if (main.includes("rain")) {
+      recommendation = "It's raining. Don't forget to bring an umbrella!";
+    } else if (main.includes("snow")) {
+      recommendation = "Snowy weather expected. Please wear warm clothing!";
+    } else if (temp >= 100) {
+      recommendation = "It's really hot outside. Stay cool and hydrated!";
+    } else if (temp <= 32) {
+      recommendation = "Freezing temperatures detected. Consider indoor activities to stay warm.";
+    } else {
+      recommendation = "Weather is pleasant. Perfect for outdoor activities!";
+    }
+  
+    return recommendation;
+  };
 
   useEffect(() => {
     getGeoLocation()
       .then((position) => {
-        console.log(position);
         setLocation(position);
       })
       .catch((error) => {
-        setErrorMsg(error);
+        setErrorMsg(`Geolocation error: ${error}`);
       });
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getWeatherDataByLatLon(location);
-      setWeatherData(response);
-      setLoading(false);
+      if (location) {
+        const response = await getWeatherDataByLatLon(location);
+        setWeatherData(response);
+        setLoading(false);
+        // Calculate and set recommendations
+        const currentWeather = response.list[0];
+        const newRecommendation = getRecommendations({
+          main: currentWeather.weather[0].main,
+          temp: currentWeather.main.temp
+        });
+        setRecommendation(newRecommendation);
+      }
     };
-    location ? fetchData() : null;
+    fetchData();
   }, [location]);
 
   useEffect(() => {
-    // filter out the days of the week
-    const tempWeek = [];
-
-    weatherData &&
-      weatherData.list.filter((block) => {
+    if (weatherData) {
+      const tempWeek = weatherData.list.filter((block, index, self) => {
         const date = new Date(block.dt * 1000);
-        const options = { weekday: "short" };
-        const day = date.toLocaleDateString("en-US", options);
-        //console.log(day);
-        if (!tempWeek.includes(day)) {
-          tempWeek.push(day);
-        }
-      });
-
-    setDaysOfWeek(tempWeek);
-
-    // then set state with the days of the week
+        return index === self.findIndex(t => new Date(t.dt * 1000).toLocaleDateString() === date.toLocaleDateString());
+      }).map(block => new Date(block.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' }));
+      setDaysOfWeek(tempWeek);
+    }
   }, [weatherData]);
 
   return (
@@ -78,16 +92,17 @@ const Homepage = () => {
         <Container>
           <Row>
             <Col sm={3} md={4}>
-              <h2>{weatherData.city.name}</h2>
+              <h2>{weatherData?.city?.name}</h2>
               <Temp
                 size="lg"
-                amount={weatherData.list[0].main.temp}
+                amount={weatherData?.list[0]?.main?.temp}
                 unit={tempUnit}
               />
-              <p>{weatherData.list[0].weather[0].description}</p>
+              <p>{weatherData?.list[0]?.weather[0]?.description}</p>
+              <p>{recommendation}</p>  {/* Display the recommendation */}
               <Image
-                src={`https://openweathermap.org/img/wn/${weatherData.list[0].weather[0].icon}@2x.png`}
-                alt={`Weather icon for ${weatherData.list[0].weather[0].description}`}
+                src={`https://openweathermap.org/img/wn/${weatherData?.list[0]?.weather[0]?.icon}@2x.png`}
+                alt={`Weather icon for ${weatherData?.list[0]?.weather[0]?.description}`}
                 width={100}
                 height={100}
               />
@@ -124,4 +139,5 @@ const Homepage = () => {
     </Section>
   );
 };
+
 export default Homepage;
